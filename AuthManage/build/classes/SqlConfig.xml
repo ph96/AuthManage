@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	
+	<!-- 配置log -->
+	<settings>
+		<setting name="logImpl" value="LOG4J"/>
+	</settings>
+	
+	<!-- 配置javaBean的别名为类名 -->
+	<typeAliases>
+		<package name="com.vo"/>
+	</typeAliases>
+	
+	<!-- 配置分页 -->
+	<plugins>
+		<plugin interceptor="com.github.pagehelper.PageHelper">
+        </plugin>
+	</plugins>
+	<!-- 使用spring数据源 -->
+	<!-- spring中dao层扫描器关联dao层.xml和dao层接口 -->
+	
+	<!-- 设置javaBean映射文件包名路径 -->
+	<!-- <mappers>
+		<package name="com.dao"></package>
+	</mappers> -->
+</configuration>

@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dao.AuthInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.vo.AuthInfo" >
+    <id column="auth_id" property="authId" jdbcType="INTEGER" />
+    <result column="parent_id" property="parentId" jdbcType="INTEGER" />
+    <result column="auth_name" property="authName" jdbcType="VARCHAR" />
+    <result column="auth_desc" property="authDesc" jdbcType="VARCHAR" />
+    <result column="auth_grade" property="authGrade" jdbcType="INTEGER" />
+    <result column="auth_type" property="authType" jdbcType="CHAR" />
+    <result column="auth_url" property="authUrl" jdbcType="VARCHAR" />
+    <result column="auth_code" property="authCode" jdbcType="VARCHAR" />
+    <result column="auth_order" property="authOrder" jdbcType="INTEGER" />
+    <result column="auth_state" property="authState" jdbcType="CHAR" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    auth_id, parent_id, auth_name, auth_desc, auth_grade, auth_type, auth_url, auth_code, 
+    auth_order, auth_state, create_by, create_time, update_by, update_time
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.vo.AuthInfoExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from auth_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from auth_info
+    where auth_id = #{authId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from auth_info
+    where auth_id = #{authId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.vo.AuthInfoExample" >
+    delete from auth_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.vo.AuthInfo" >
+    insert into auth_info (auth_id, parent_id, auth_name, 
+      auth_desc, auth_grade, auth_type, 
+      auth_url, auth_code, auth_order, 
+      auth_state, create_by, create_time, 
+      update_by, update_time)
+    values (#{authId,jdbcType=INTEGER}, #{parentId,jdbcType=INTEGER}, #{authName,jdbcType=VARCHAR}, 
+      #{authDesc,jdbcType=VARCHAR}, #{authGrade,jdbcType=INTEGER}, #{authType,jdbcType=CHAR}, 
+      #{authUrl,jdbcType=VARCHAR}, #{authCode,jdbcType=VARCHAR}, #{authOrder,jdbcType=INTEGER}, 
+      #{authState,jdbcType=CHAR}, #{createBy,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateBy,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.vo.AuthInfo" >
+    insert into auth_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="authId != null" >
+        auth_id,
+      </if>
+      <if test="parentId != null" >
+        parent_id,
+      </if>
+      <if test="authName != null" >
+        auth_name,
+      </if>
+      <if test="authDesc != null" >
+        auth_desc,
+      </if>
+      <if test="authGrade != null" >
+        auth_grade,
+      </if>
+      <if test="authType != null" >
+        auth_type,
+      </if>
+      <if test="authUrl != null" >
+        auth_url,
+      </if>
+      <if test="authCode != null" >
+        auth_code,
+      </if>
+      <if test="authOrder != null" >
+        auth_order,
+      </if>
+      <if test="authState != null" >
+        auth_state,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="authId != null" >
+        #{authId,jdbcType=INTEGER},
+      </if>
+      <if test="parentId != null" >
+        #{parentId,jdbcType=INTEGER},
+      </if>
+      <if test="authName != null" >
+        #{authName,jdbcType=VARCHAR},
+      </if>
+      <if test="authDesc != null" >
+        #{authDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="authGrade != null" >
+        #{authGrade,jdbcType=INTEGER},
+      </if>
+      <if test="authType != null" >
+        #{authType,jdbcType=CHAR},
+      </if>
+      <if test="authUrl != null" >
+        #{authUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="authCode != null" >
+        #{authCode,jdbcType=VARCHAR},
+      </if>
+      <if test="authOrder != null" >
+        #{authOrder,jdbcType=INTEGER},
+      </if>
+      <if test="authState != null" >
+        #{authState,jdbcType=CHAR},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.vo.AuthInfoExample" resultType="java.lang.Integer" >
+    select count(*) from auth_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update auth_info
+    <set >
+      <if test="record.authId != null" >
+        auth_id = #{record.authId,jdbcType=INTEGER},
+      </if>
+      <if test="record.parentId != null" >
+        parent_id = #{record.parentId,jdbcType=INTEGER},
+      </if>
+      <if test="record.authName != null" >
+        auth_name = #{record.authName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.authDesc != null" >
+        auth_desc = #{record.authDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="record.authGrade != null" >
+        auth_grade = #{record.authGrade,jdbcType=INTEGER},
+      </if>
+      <if test="record.authType != null" >
+        auth_type = #{record.authType,jdbcType=CHAR},
+      </if>
+      <if test="record.authUrl != null" >
+        auth_url = #{record.authUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="record.authCode != null" >
+        auth_code = #{record.authCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.authOrder != null" >
+        auth_order = #{record.authOrder,jdbcType=INTEGER},
+      </if>
+      <if test="record.authState != null" >
+        auth_state = #{record.authState,jdbcType=CHAR},
+      </if>
+      <if test="record.createBy != null" >
+        create_by = #{record.createBy,jdbcType=INTEGER},
+      </if>
+      <if test="record.createTime != null" >
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateBy != null" >
+        update_by = #{record.updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="record.updateTime != null" >
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update auth_info
+    set auth_id = #{record.authId,jdbcType=INTEGER},
+      parent_id = #{record.parentId,jdbcType=INTEGER},
+      auth_name = #{record.authName,jdbcType=VARCHAR},
+      auth_desc = #{record.authDesc,jdbcType=VARCHAR},
+      auth_grade = #{record.authGrade,jdbcType=INTEGER},
+      auth_type = #{record.authType,jdbcType=CHAR},
+      auth_url = #{record.authUrl,jdbcType=VARCHAR},
+      auth_code = #{record.authCode,jdbcType=VARCHAR},
+      auth_order = #{record.authOrder,jdbcType=INTEGER},
+      auth_state = #{record.authState,jdbcType=CHAR},
+      create_by = #{record.createBy,jdbcType=INTEGER},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_by = #{record.updateBy,jdbcType=INTEGER},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.vo.AuthInfo" >
+    update auth_info
+    <set >
+      <if test="parentId != null" >
+        parent_id = #{parentId,jdbcType=INTEGER},
+      </if>
+      <if test="authName != null" >
+        auth_name = #{authName,jdbcType=VARCHAR},
+      </if>
+      <if test="authDesc != null" >
+        auth_desc = #{authDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="authGrade != null" >
+        auth_grade = #{authGrade,jdbcType=INTEGER},
+      </if>
+      <if test="authType != null" >
+        auth_type = #{authType,jdbcType=CHAR},
+      </if>
+      <if test="authUrl != null" >
+        auth_url = #{authUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="authCode != null" >
+        auth_code = #{authCode,jdbcType=VARCHAR},
+      </if>
+      <if test="authOrder != null" >
+        auth_order = #{authOrder,jdbcType=INTEGER},
+      </if>
+      <if test="authState != null" >
+        auth_state = #{authState,jdbcType=CHAR},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where auth_id = #{authId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.vo.AuthInfo" >
+    update auth_info
+    set parent_id = #{parentId,jdbcType=INTEGER},
+      auth_name = #{authName,jdbcType=VARCHAR},
+      auth_desc = #{authDesc,jdbcType=VARCHAR},
+      auth_grade = #{authGrade,jdbcType=INTEGER},
+      auth_type = #{authType,jdbcType=CHAR},
+      auth_url = #{authUrl,jdbcType=VARCHAR},
+      auth_code = #{authCode,jdbcType=VARCHAR},
+      auth_order = #{authOrder,jdbcType=INTEGER},
+      auth_state = #{authState,jdbcType=CHAR},
+      create_by = #{createBy,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=INTEGER},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where auth_id = #{authId,jdbcType=INTEGER}
+  </update>
+</mapper>

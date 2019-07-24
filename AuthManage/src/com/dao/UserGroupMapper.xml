@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.UserGroupMapper">
+
+<!-- 用户组VO -->
+	<resultMap id="UserGroupMap" type="com.vo.UserGroup" >
+	    <id column="group_id" property="groupId" jdbcType="INTEGER" />
+	    <result column="group_name" property="groupName" jdbcType="VARCHAR" />
+	    <result column="group_code" property="groupCode" jdbcType="VARCHAR" />
+	    <result column="group_desc" property="groupDesc" jdbcType="VARCHAR" />
+	    <result column="group_state" property="groupState" jdbcType="CHAR" />
+	  </resultMap>
+	  <!-- 全查用户组 -->
+	  <select id="fullUserGroup" parameterType="HashMap" resultMap="UserGroupMap">
+	  		select * from user_group 
+	  		<where>
+				<if test="UserGroup.groupState != null and UserGroup.groupState != '' and UserGroup.groupState != 99" >
+					AND group_state=#{UserGroup.groupState}
+				</if>
+				<if test="UserGroup.groupName != null and UserGroup.groupName != ''">
+					AND group_name LIKE concat("%",#{UserGroup.groupName},"%") 
+				</if>
+			</where>
+			<if test="PageUtil != null">
+			  LIMIT #{PageUtil.limitIndex},#{PageUtil.pageSize}
+			</if>
+	  </select>
+	  
+	  <!-- 查询用户组是否删除 -->
+	  <select id="hasGroupDelete" parameterType="String" resultType="String">
+	  	select group_id from user_group where group_id=#{groupId}
+	  </select>
+	  <!-- 删除用户组 -->
+	  <delete id="deleteGroup" parameterType="String" >
+	  	delete from user_group where group_id=#{groupId}
+	  </delete>
+	  
+	  <!-- 更新用户组 -->
+	  <update id="updateGroup" parameterType="UserGroup">
+	  	update user_group set group_desc=#{groupDesc} where group_name=#{groupName}
+	  </update>
+	  
+	  <!-- 禁用或启用 -->
+	  <update id="DisableOrEnable" parameterType="HashMap">
+	  	update user_group 
+		<set>
+			<if test="groupState == 0">
+				group_state='1'
+			</if>
+			<if test="groupState == 1">
+				group_state='0'
+			</if>
+			where group_id=#{groupId}
+		</set>
+	  </update>
+<!-- 角色Vo -->
+	<resultMap id="RoleMap" type="com.vo.Role" >
+	    <id column="role_id" property="roleId" jdbcType="INTEGER" />
+	    <result column="role_name" property="roleName" jdbcType="VARCHAR" />
+	    <result column="role_desc" property="roleDesc" jdbcType="VARCHAR" />
+	    <result column="role_code" property="roleCode" jdbcType="VARCHAR" />
+	    <result column="role_state" property="roleState" jdbcType="CHAR" />
+	    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+	    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+	    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+	    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+	  </resultMap>	  
+	  <!-- 获取用户组角色 -->
+	  <select id="groupRole" parameterType="String" resultMap="RoleMap">
+	  	SELECT r.* FROM group_role gr,role r WHERE gr.group_id=#{groupId} AND gr.role_id=r.`role_id`
+	  </select>
+	  <!-- 判断传的字符串与group_role表是否一致，一致不插入 -->
+	  <select id="roleIdEqGroupRole" parameterType="String" resultType="String">
+	  	SELECT GROUP_CONCAT(role_id) FROM group_role WHERE group_id=#{groupId}
+	  </select>
+	  <!-- 删除当前用户组所有角色 -->
+	  <delete id="deleteGroupRole" parameterType="String">
+	  	delete from group_role where group_id=#{groupId}
+  	  </delete>
+	  <!-- 更新当前用户组的角色 -->
+	  <insert id="updaeGroupRole" parameterType="HashMap">
+	  	insert into group_role(group_id,role_id) values(#{groupId},#{roleId})
+	  </insert>
+	  
+	  <!-- 查询用户组名和用户组Code是否重复 -->
+	  <select id="isGroupRedo" parameterType="HashMap" resultType="String">
+	  	select group_id from user_group 
+		<where>
+			<if test="groupName != null">
+				group_name=#{groupName}
+			</if>
+			<if test="groupCode != null">
+				group_code=#{groupCode}
+			</if>
+		</where>
+	  </select>
+	  <!-- 添加用户组 -->
+	  <insert id="addGroup" parameterType="UserGroup">
+	  	insert into user_group(group_name,group_code,group_desc) values(#{groupName},#{groupCode},#{groupDesc})
+	  </insert>
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+</mapper>
+
+
+

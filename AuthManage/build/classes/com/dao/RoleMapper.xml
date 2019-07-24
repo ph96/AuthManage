@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.RoleMapper">
+<!-- 角色VO -->
+	<resultMap id="RoleMap" type="com.vo.Role" >
+	    <id column="role_id" property="roleId" jdbcType="INTEGER" />
+	    <result column="role_name" property="roleName" jdbcType="VARCHAR" />
+	    <result column="role_desc" property="roleDesc" jdbcType="VARCHAR" />
+	    <result column="role_code" property="roleCode" jdbcType="VARCHAR" />
+	    <result column="role_state" property="roleState" jdbcType="CHAR" />
+	    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+	    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+	    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+	    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+	  </resultMap>
+	<!-- 全查角色 -->
+	<select id="fullRoles" parameterType="HashMap" resultMap="RoleMap">
+		select * from role 
+			<where>
+				<if test="Role.roleState != null and Role.roleState != '' and Role.roleState != 99" >
+					AND role_state=#{Role.roleState}
+				</if>
+				<if test="Role.roleName != null and Role.roleName != ''">
+					AND role_name LIKE concat("%",#{Role.roleName},"%") 
+				</if>
+			</where>
+			<if test="PageUtil != null">
+			  LIMIT #{PageUtil.limitIndex},#{PageUtil.pageSize}
+			</if>
+	</select>
+	
+	<!-- 查询角色是否删除 -->
+	<select id="hasDelete" parameterType="String" resultMap="RoleMap">
+		select * from role where role_id=#{roleId}
+	</select>
+	<!-- 删除角色 -->
+	<delete id="deleteRole" parameterType="String">
+		delete from role where role_id=#{roleId}
+	</delete>
+	
+	<!-- 更新角色信息 -->
+	<update id="updateRole" parameterType="Role">
+		update role set role_desc=#{roleDesc} where role_name=#{roleName}
+	</update>
+	
+	<!-- 更新人修改update_by -->
+	<update id="updateRoleBy" parameterType="HashMap">
+		update role r,(SELECT role_id a FROM role WHERE role_name='111111') a set update_by=#{UserId} 
+		<where>
+				<if test="roleName != null">
+					role_id=a
+				</if>
+				<if test="roleId != null">
+					role_id=#{roleId}
+				</if>
+		</where>
+	</update>
+	
+	<!-- 禁用或启用 -->
+	<update id="DisableOrEnable" parameterType="HashMap">
+		update role
+		 <set>
+		 	<if test="forbuddenId == 0">
+		 		role_state=1
+		 	</if>
+		 	<if test="forbuddenId == 1">
+		 		role_state=0
+		 	</if>
+		 </set>
+		where role_id=#{roleId}
+	</update>
+<!-- 权限Map -->
+<resultMap id="authInfoMap" type="com.vo.AuthInfo" >
+    <id column="auth_id" property="authId" jdbcType="INTEGER" />
+    <result column="parent_id" property="parentId" jdbcType="INTEGER" />
+    <result column="auth_name" property="authName" jdbcType="VARCHAR" />
+    <result column="auth_desc" property="authDesc" jdbcType="VARCHAR" />
+    <result column="auth_grade" property="authGrade" jdbcType="INTEGER" />
+    <result column="auth_type" property="authType" jdbcType="CHAR" />
+    <result column="auth_url" property="authUrl" jdbcType="VARCHAR" />
+    <result column="auth_code" property="authCode" jdbcType="VARCHAR" />
+    <result column="auth_order" property="authOrder" jdbcType="INTEGER" />
+    <result column="auth_state" property="authState" jdbcType="CHAR" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>	
+  	
+	<!-- 查询角色权限 -->
+	<select id="findRoleAuth" parameterType="String" resultMap="authInfoMap">
+		SELECT ai.* FROM role_auth ra,auth_info ai WHERE ra.role_id=#{roleId} AND ra.auth_id=ai.auth_id
+	</select>
+	<!-- 判断传的字符串与role_auth表是否一致，一致不插入 -->
+	<select id="roleAuthEqAuth" parameterType="String" resultType="String">
+		SELECT GROUP_CONCAT(auth_id) FROM role_auth WHERE role_id=#{roleId}
+	</select>
+	<!-- 删除角色权限 -->
+	<delete id="deleteRoleAuth" parameterType="String">
+		delete from role_auth where role_id=#{roleId}
+	</delete>
+	<!-- 更新权限 -->
+	<insert id="updateRoleAuth"  parameterType="HashMap">
+		INSERT  INTO `role_auth`(`auth_id`,`role_id`) VALUES (#{authId},#{roleId})
+	</insert>
+	
+	<!-- 判断角色名和角色Code是否重复 -->
+	<select id="isRoleRedo"  parameterType="HashMap" resultType="String">
+		select role_id from role 
+		<where>
+			<if test="roleName != null">
+				role_name=#{roleName}
+			</if>
+			<if test="roleCode != null">
+				role_code=#{roleCode}
+			</if>
+		</where>
+	</select>
+	<!-- 添加角色 -->
+	<insert id="addRole" parameterType="Role">
+		insert into role(role_name,role_desc,role_code,create_by,update_by) values(#{roleName},#{roleDesc},#{roleCode},#{createBy},#{updateBy});
+	</insert>
+	
+	
+	
+	
+	
+	
+	
+</mapper>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.LoginMapper">
+	<resultMap id="UserInfoMap" type="com.vo.UserInfo" >
+    <id column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="group_id" property="groupId" jdbcType="INTEGER" />
+    <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+    <result column="user_code" property="userCode" jdbcType="VARCHAR" />
+    <result column="user_pwd" property="userPwd" jdbcType="VARCHAR" />
+    <result column="user_type" property="userType" jdbcType="CHAR" />
+    <result column="user_state" property="userState" jdbcType="CHAR" />
+    <result column="is_delete" property="isDelete" jdbcType="CHAR" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <!-- 查询用户 -->
+	<select id="QueryUserJudgment" parameterType="Login" resultMap="UserInfoMap">
+		SELECT * FROM user_info WHERE user_code=#{userCode} and user_pwd=MD5(#{userPwd}) AND user_state=1
+	</select>
+	
+  <resultMap id="AuthInfoMap" type="com.vo.AuthInfo" >
+    <id column="auth_id" property="authId" jdbcType="INTEGER" />
+    <result column="parent_id" property="parentId" jdbcType="INTEGER" />
+    <result column="auth_name" property="authName" jdbcType="VARCHAR" />
+    <result column="auth_desc" property="authDesc" jdbcType="VARCHAR" />
+    <result column="auth_grade" property="authGrade" jdbcType="INTEGER" />
+    <result column="auth_type" property="authType" jdbcType="CHAR" />
+    <result column="auth_url" property="authUrl" jdbcType="VARCHAR" />
+    <result column="auth_code" property="authCode" jdbcType="VARCHAR" />
+    <result column="auth_order" property="authOrder" jdbcType="INTEGER" />
+    <result column="auth_state" property="authState" jdbcType="CHAR" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+	<!-- 查询用户拥有的权限 -->
+	<select id="userRight" parameterType="HashMap" resultMap="AuthInfoMap">
+		SELECT * FROM auth_info WHERE auth_id IN
+			(SELECT ua.`auth_id` FROM user_info ui,user_auth ua 
+			WHERE ui.`user_id`=ua.`user_id` AND ui.`user_state`=1 AND ui.`is_delete`=0
+			AND ui.`user_id`=#{userId})
+			AND auth_state=1 AND parent_id=#{authId}
+		UNION
+		SELECT * FROM auth_info WHERE auth_id IN
+			(SELECT auth_id FROM role_auth WHERE role_id IN
+			(SELECT ur.role_id FROM user_role ur,role r,user_info ui 
+			WHERE ur.role_id=r.role_id AND ui.user_id=ur.user_id
+			AND r.role_state=1 AND ui.user_id=#{userId}))
+			AND auth_state=1 AND parent_id=#{authId}
+		UNION
+		SELECT * FROM auth_info WHERE auth_id IN
+			(SELECT auth_id FROM role_auth WHERE role_id IN
+			(SELECT gr.role_id FROM group_role gr,role r 
+			WHERE gr.role_id=r.role_id AND r.`role_state`=1 AND 
+			 gr.group_id IN
+			(SELECT ui.group_id FROM user_info ui,user_group ug
+			WHERE ui.`group_id`=ug.group_id AND ug.group_state=1
+			AND ui.group_id=#{groupId})))
+			AND auth_state=1 AND parent_id=#{authId}
+			</select>
+</mapper>

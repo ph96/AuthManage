@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.AuthMapper">
+		
+	<!-- 查询是否已删除 -->
+	<select id="IfDelete" parameterType="String" resultType="String">
+		select auth_id from auth_info where auth_id=#{authId} and auth_state=0
+	</select>
+	<!-- 删除权限 -->
+	<update id="deleteAuth" parameterType="String">
+		update auth_info set auth_state='0' where auth_id=#{authId}
+	</update>
+	
+	<!-- 恢复权限 -->
+	<update id="recoverAuth" parameterType="String">
+		update auth_info set auth_state='1' where auth_id=#{authId}
+	</update>
+	
+	<!-- 判断权限名,Url,Code是否重复 -->
+	<select id="isAuthName" parameterType="HashMap" resultType="String">
+		select auth_name from auth_info 
+		<where>
+			<if test="null != authName">
+		 	 	auth_name=#{authName}
+		 	</if>
+		 	<if test="null != authUrl">
+		 		auth_url=#{authUrl}
+		 	</if>
+		 	<if test="null != authCode">
+		 		auth_code=#{authCode}
+		 	</if>
+		 </where>
+	</select>
+	
+	<!-- 更新权限信息 -->
+	<update id="updateAuth" parameterType="AuthInfo">
+		update auth_info set auth_name=#{authName} , auth_desc=#{authDesc}  where auth_id=#{authId}
+	</update>
+	<!-- 更新修改人 -->
+	<update id="updateUpdateBy" parameterType="HashMap">
+		update auth_info set update_by=#{userId}  where auth_id=#{authId}
+	</update>
+	
+	<!-- 添加权限 -->
+	<insert id="addAuth" parameterType="AuthInfo" >
+    insert into auth_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="authId != null" >
+        auth_id,
+      </if>
+      <if test="parentId != null" >
+        parent_id,
+      </if>
+      <if test="authName != null" >
+        auth_name,
+      </if>
+      <if test="authDesc != null" >
+        auth_desc,
+      </if>
+      <if test="authGrade != null" >
+        auth_grade,
+      </if>
+      <if test="authType != null" >
+        auth_type,
+      </if>
+      <if test="authUrl != null" >
+        auth_url,
+      </if>
+      <if test="authCode != null" >
+        auth_code,
+      </if>
+      <if test="authOrder != null" >
+        auth_order,
+      </if>
+      <if test="authState != null" >
+        auth_state,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="authId != null" >
+        #{authId,jdbcType=INTEGER},
+      </if>
+      <if test="parentId != null" >
+        #{parentId,jdbcType=INTEGER},
+      </if>
+      <if test="authName != null" >
+        #{authName,jdbcType=VARCHAR},
+      </if>
+      <if test="authDesc != null" >
+        #{authDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="authGrade != null" >
+        #{authGrade,jdbcType=INTEGER},
+      </if>
+      <if test="authType != null" >
+        #{authType,jdbcType=CHAR},
+      </if>
+      <if test="authUrl != null" >
+        #{authUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="authCode != null" >
+        #{authCode,jdbcType=VARCHAR},
+      </if>
+      <if test="authOrder != null" >
+        #{authOrder,jdbcType=INTEGER},
+      </if>
+      <if test="authState != null" >
+        #{authState,jdbcType=CHAR},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</mapper>

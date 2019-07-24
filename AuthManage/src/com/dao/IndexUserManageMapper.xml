@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.IndexUserManageMapper">
+
+	<resultMap id="IndexUserInfoMap" type="com.vo.UserInfo" >
+	    <id column="user_id" property="userId" jdbcType="INTEGER" />
+	    <result column="group_id" property="groupId" jdbcType="INTEGER" />
+	    <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+	    <result column="user_code" property="userCode" jdbcType="VARCHAR" />
+	    <result column="user_pwd" property="userPwd" jdbcType="VARCHAR" />
+	    <result column="user_type" property="userType" jdbcType="CHAR" />
+	    <result column="user_state" property="userState" jdbcType="CHAR" />
+	    <result column="is_delete" property="isDelete" jdbcType="CHAR" />
+	    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+	    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+	    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+	    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+	    <result column="group_name" property="groupName" jdbcType="VARCHAR" />
+	    <result column="role_name" property="roleName" jdbcType="VARCHAR" />
+	  </resultMap>
+	<!-- 全查用户 -->
+	<select id="fullUser" parameterType="HashMap" resultMap="IndexUserInfoMap" >
+		SELECT ui.*,ug.group_name,r.role_name FROM user_info ui,user_group ug,role r
+			<where>
+				ui.user_type=r.role_id AND ui.group_id=ug.group_id
+				<if test="UserInfo.userState != null and UserInfo.userState != '' and UserInfo.userState != 99" >
+					AND user_state=#{UserInfo.userState}
+				</if>
+				<if test="UserInfo.userCode != null and UserInfo.userCode != ''">
+					AND user_code LIKE concat("%",#{UserInfo.userCode},"%") 
+				</if>
+				<if test="UserInfo.userType != null and UserInfo.userType != '' and UserInfo.userType != 99" >
+					AND user_type=#{UserInfo.userType}
+				</if>
+				 and ui.is_delete=0
+				<if test="PageUtil != null">
+				 LIMIT #{PageUtil.limitIndex},#{PageUtil.pageSize}
+				</if>
+			</where>
+	</select>
+	<!--更新update_By -->
+	<update id="updateUserBy" parameterType="HashMap">
+		update user_info set update_by=#{UserId} where user_id=#{userId}
+	</update>
+	
+	<resultMap id="userGroupMap" type="com.vo.UserGroup" >
+	    <id column="group_id" property="groupId" jdbcType="INTEGER" />
+	    <result column="group_name" property="groupName" jdbcType="VARCHAR" />
+	    <result column="group_code" property="groupCode" jdbcType="VARCHAR" />
+	    <result column="group_desc" property="groupDesc" jdbcType="VARCHAR" />
+	    <result column="group_state" property="groupState" jdbcType="CHAR" />
+	  </resultMap>
+	<!-- 查询所有部门 -->
+	<select id="findGroup" resultMap="userGroupMap">
+		select * from user_group 
+	</select>
+	<!-- 角色VO -->
+	<resultMap id="RolesMap" type="com.vo.Role" >
+	    <id column="role_id" property="roleId" jdbcType="INTEGER" />
+	    <result column="role_name" property="roleName" jdbcType="VARCHAR" />
+	    <result column="role_desc" property="roleDesc" jdbcType="VARCHAR" />
+	    <result column="role_code" property="roleCode" jdbcType="VARCHAR" />
+	    <result column="role_state" property="roleState" jdbcType="CHAR" />
+	    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+	    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+	    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+	    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+	  </resultMap>
+	<!-- 查询所有角色 -->
+	<select id="fullRoles" resultMap="RolesMap">
+		select * from role where role_state=1
+	</select>
+	<!-- 删除用户 -->
+	<update id="deleteUser" parameterType="String">
+		update user_info set is_delete=1 where user_id=#{userId}
+	</update>
+	<!-- 查询用户有无删除 -->
+	<select id="hasDelete" parameterType="String" resultMap="IndexUserInfoMap">
+		select * from user_info where user_id=#{userId} and is_delete=1
+	</select>
+	<!-- 重置密码 -->
+	<update id="resetPassword" parameterType="String">
+		update user_info set user_pwd=md5('123456') where user_id=#{userId}
+	</update>
+	<!-- 判断重置后的密码是否是重置密码 -->
+	<select id="hasResetPassword" parameterType="String" resultType="String">
+		select user_id from user_info where user_id=#{userId} and user_pwd=md5('123456')
+	</select>
+	<!-- 启用 禁用 用户 -->
+	<update id="forbuddenUser" parameterType="HashMap">
+		update user_info
+		 <set>
+		 	<if test="forbuddenId == 0">
+		 		user_state=1
+		 	</if>
+		 	<if test="forbuddenId == 1">
+		 		user_state=0
+		 	</if>
+		 </set>
+		where user_id=#{UserId}
+	</update>
+	<!-- 判断用户名是否重复 -->
+	<select id="redoUser" parameterType="String" resultMap="IndexUserInfoMap">
+		select * from user_info where user_code=#{userCode}
+	</select>
+	<!-- 添加用户 -->
+	<insert id="addUser" parameterType="UserInfo">
+		INSERT INTO `user_info` ( `group_id`, `nick_name`, `user_code`, `user_pwd`, user_type,  `create_by`, `update_by`) 
+					VALUES (#{groupId}, #{nickName}, #{userCode}, md5(#{userPwd}), 3 ,  #{createBy}, #{updateBy}); 
+	</insert>
+	<!-- 更新用户信息 -->
+	<update id="updateUser" parameterType="UserInfo">
+		update user_info set group_id=#{groupId} , nick_name=#{nickName} where user_id=#{userId} and user_code=#{userCode}
+	</update>
+	
+	<!-- 查询当前用户的角色 -->
+	<select id="groupIdUser" parameterType="String" resultMap="RolesMap" >
+		SELECT r.* FROM user_role ur,role r WHERE ur.`user_id`=#{userId} AND ur.`role_id`=r.`role_id`
+	</select>
+	
+	<!-- 删除当前用户的所有角色 -->
+	<delete id="deleteAllRole" parameterType="String">
+		delete from user_role where user_id=#{userId}
+	</delete>
+	<!-- 更新当前用户角色 -->
+	<insert id="updatRoleUser" parameterType="HashMap">
+		INSERT  INTO `user_role`(`role_id`,`user_id`) VALUES (#{roleId},#{userId})
+	</insert>
+	<!-- 判断传的字符串与user_role表是否一致 -->
+	<select id="roleIdRqUserRole" parameterType="String" resultType="String">
+		SELECT GROUP_CONCAT(role_id) FROM user_role WHERE user_id=#{userId}
+	</select>
+<!-- 权限Map -->
+<resultMap id="authInfoMap" type="com.vo.AuthInfo" >
+    <id column="auth_id" property="authId" jdbcType="INTEGER" />
+    <result column="parent_id" property="parentId" jdbcType="INTEGER" />
+    <result column="auth_name" property="authName" jdbcType="VARCHAR" />
+    <result column="auth_desc" property="authDesc" jdbcType="VARCHAR" />
+    <result column="auth_grade" property="authGrade" jdbcType="INTEGER" />
+    <result column="auth_type" property="authType" jdbcType="CHAR" />
+    <result column="auth_url" property="authUrl" jdbcType="VARCHAR" />
+    <result column="auth_code" property="authCode" jdbcType="VARCHAR" />
+    <result column="auth_order" property="authOrder" jdbcType="INTEGER" />
+    <result column="auth_state" property="authState" jdbcType="CHAR" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>	
+	<!-- 查询所有的权限 -->
+	<select id="ownershipLimit" resultMap="authInfoMap">
+		select * from auth_info 
+	</select>
+	<!-- 查询用户权限 -->
+	<select id="findAuthByUser" parameterType="String" resultMap="authInfoMap">
+		select ai.* from user_auth ua,auth_info ai where ua.user_id=#{userId} and ua.auth_id=ai.auth_id 
+	</select>
+	<!-- 判断传的字符串与user_auth表是否一致 -->
+	<select id="authRqUserAuth" parameterType="String" resultType="String">
+		SELECT GROUP_CONCAT(auth_id) FROM user_auth WHERE user_id=#{userId}
+	</select>
+	<!-- 删除用户权限 -->
+	<delete id="deleteAllAuth" parameterType="String">
+		delete from user_auth where user_id=#{userId}
+	</delete>
+	<!-- 添加用户权限 -->
+	<insert id="updateAuthUser" parameterType="HashMap">
+		INSERT  INTO `user_auth`(`auth_id`,`user_id`) VALUES (#{authId},#{userId})
+	</insert>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</mapper>

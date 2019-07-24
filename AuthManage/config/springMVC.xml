@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+       http://www.springframework.org/schema/mvc
+	   http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-4.0.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd">
+       
+       <!-- 自动扫描controller   Bean -->
+       <context:component-scan base-package="com.controller"></context:component-scan>
+       
+       <!-- 注解驱动 -->
+       <!-- 使用mvc:annotation-driven代替上边注解映射器和注解适配器配置使用
+      		 mvc:annotation-driven不用配置上边的
+      		 RequestMappingHandlerMapping和RequestMappingHandlerAdapter
+			  实际开发时使用mvc:annotation-driven -->
+	   <!-- <mvc:annotation-driven></mvc:annotation-driven> -->
+	   
+	   <!-- json数据处理配置 -->
+		<mvc:annotation-driven>
+		    <mvc:message-converters register-defaults="false">
+	             <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">  
+	                <property name="supportedMediaTypes">  
+	                    <list>
+	                        <value>text/html;charset=UTF-8</value>
+	                        <value>application/json;charset=UTF-8</value>  
+	                    </list>  
+	                </property>  
+	            </bean>  
+	        </mvc:message-converters>
+		</mvc:annotation-driven>
+		
+		<!-- 定义事务管理器 -->
+		<bean id="transactionManager"
+			class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+			<property name="dataSource" ref="c3p0ds" />
+		</bean>
+		<!--使用注释事务 -->
+		<tx:annotation-driven  transaction-manager="transactionManager" />
+		
+		
+	   <!-- 配置视图解析器 -->
+       <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"></bean>
+</beans>
